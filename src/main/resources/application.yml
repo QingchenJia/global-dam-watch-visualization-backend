@@ -1,0 +1,14 @@
+server:
+  port: 8100
+spring:
+  application:
+    name: backend-springboot
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://192.168.16.100:5432/gdw
+    username: postgres
+    password: postgres
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
