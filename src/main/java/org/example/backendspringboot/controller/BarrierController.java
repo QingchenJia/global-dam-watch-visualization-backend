@@ -1,6 +1,8 @@
 package org.example.backendspringboot.controller;
 
 import org.example.backendspringboot.common.Result;
+import org.example.backendspringboot.dto.BarrierForm;
+import org.example.backendspringboot.dto.BarrierStatsDto;
 import org.example.backendspringboot.entity.Barrier;
 import org.example.backendspringboot.service.BarrierService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +39,10 @@ public class BarrierController {
     @PostMapping("/filter")
     public Result<List<Barrier>> filterBarriers(@RequestBody String sql) {
         return Result.success(barrierService.databaseOperation(sql));
+    }
+
+    @PostMapping("/stats")
+    public Result<BarrierStatsDto> dataStats(@RequestBody BarrierForm form) {
+        return Result.success(barrierService.dataStats(form));
     }
 }

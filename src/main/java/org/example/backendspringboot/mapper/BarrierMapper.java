@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.example.backendspringboot.common.StatsData;
 import org.example.backendspringboot.entity.Barrier;
 
 import java.util.List;
@@ -28,4 +29,34 @@ public interface BarrierMapper extends BaseMapper<Barrier> {
             SELECT gdw_id,dam_name FROM public.gdw_barrier WHERE dam_name LIKE #{damName};
             """)
     List<Barrier> selectLikeName(String damName);
+
+    @Select("""
+            SELECT dam_type as name,COUNT(*) as value FROM public.gdw_barrier GROUP BY dam_type;
+            """)
+    List<StatsData> damTypeStats();
+
+    @Select("""
+            SELECT power_mw as name,COUNT(*) as value FROM public.gdw_barrier GROUP BY power_mw;
+            """)
+    List<StatsData> powerMwStats();
+
+    @Select("""
+            SELECT main_use as name,COUNT(*) as value FROM public.gdw_barrier GROUP BY main_use;
+            """)
+    List<StatsData> mainUseStats();
+
+    @Select("""
+            SELECT quality as name,COUNT(*) as value FROM public.gdw_barrier GROUP BY quality;
+            """)
+    List<StatsData> qualityStats();
+
+    @Select("""
+            SELECT year_dam as name,COUNT(*) as value FROM public.gdw_barrier GROUP BY year_dam;
+            """)
+    List<StatsData> yearDamStats();
+
+    @Select("""
+            SELECT country as name,COUNT(*) as value FROM public.gdw_barrier GROUP BY country;
+            """)
+    List<StatsData> countryStats();
 }
