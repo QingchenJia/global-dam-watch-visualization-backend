@@ -1,15 +1,18 @@
 package org.example.backendspringboot.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.example.backendspringboot.common.RangeData;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class BarrierForm {
 
     List<String> damType;
 
-    String powerMw;
+    RangeData damLenM;
 
     List<String> mainBasin;
 
@@ -21,5 +24,5 @@ public class BarrierForm {
 
     List<String> country;
 
-    String damHgtM;
+    RangeData damHgtM;
 }

@@ -53,9 +53,10 @@
         </dependency>
 
         <dependency>
-            <groupId>com.graphhopper.external</groupId>
-            <artifactId>jackson-datatype-jts</artifactId>
-            <version>1.0-2.7</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.18.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
