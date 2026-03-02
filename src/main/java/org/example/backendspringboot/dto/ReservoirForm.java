@@ -1,15 +1,16 @@
 package org.example.backendspringboot.dto;
 
 import lombok.Data;
+import org.example.backendspringboot.common.RangeData;
 
 import java.util.List;
 
 @Data
 public class ReservoirForm {
 
-    String capMcm;
+    RangeData capMcm;
 
-    String areaSkm;
+    RangeData areaSkm;
 
     List<String> mainBasin;
 
@@ -21,5 +22,5 @@ public class ReservoirForm {
 
     List<String> country;
 
-    String depthM;
+    RangeData depthM;
 }

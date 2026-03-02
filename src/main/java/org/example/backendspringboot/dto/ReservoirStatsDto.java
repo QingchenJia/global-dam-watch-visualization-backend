@@ -1,14 +1,16 @@
 package org.example.backendspringboot.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.example.backendspringboot.common.StatsData;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
 public class ReservoirStatsDto {
 
-    private int total;
+    private long total;
 
     List<StatsData> capMcm;
 
@@ -18,7 +20,7 @@ public class ReservoirStatsDto {
 
     List<StatsData> quality;
 
-    List<StatsData> yearRes;
+    List<StatsData> yearDam;
 
     List<StatsData> country;
 }

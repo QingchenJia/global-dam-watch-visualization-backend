@@ -7,17 +7,13 @@ import lombok.Data;
 @AllArgsConstructor
 public class RangeData {
 
-    /*
-     * 所有字段默认设置为-1
-     * 解析处理时忽略值为-1的字段
-     * */
-    private int eq = -1;
+    private int eq;
 
-    private int gt = -1;
+    private int gt;
 
-    private int ge = -1;
+    private int ge;
 
-    private int lt = -1;
+    private int lt;
 
-    private int le = -1;
+    private int le;
 }

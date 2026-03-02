@@ -1,6 +1,8 @@
 package org.example.backendspringboot.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.example.backendspringboot.dto.ReservoirForm;
+import org.example.backendspringboot.dto.ReservoirStatsDto;
 import org.example.backendspringboot.entity.Reservoir;
 
 import java.util.List;
@@ -14,4 +16,6 @@ public interface ReservoirService extends IService<Reservoir> {
     Reservoir showDescription(int gdwId);
 
     Reservoir findLikeName(String resName);
+
+    ReservoirStatsDto dataStats(ReservoirForm form);
 }

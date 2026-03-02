@@ -1,6 +1,8 @@
 package org.example.backendspringboot.controller;
 
 import org.example.backendspringboot.common.Result;
+import org.example.backendspringboot.dto.ReservoirForm;
+import org.example.backendspringboot.dto.ReservoirStatsDto;
 import org.example.backendspringboot.entity.Reservoir;
 import org.example.backendspringboot.service.ReservoirService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,5 +39,10 @@ public class ReservoirController {
     @PostMapping("/filter")
     public Result<List<Reservoir>> filterReservoirs(@RequestBody String sql) {
         return Result.success(reservoirService.databaseOperation(sql));
+    }
+
+    @PostMapping("/stats")
+    public Result<ReservoirStatsDto> dataStats(@RequestBody ReservoirForm form) {
+        return Result.success(reservoirService.dataStats(form));
     }
 }

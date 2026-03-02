@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BarrierStatsDto {
 
-    private int total;
+    private long total;
 
     List<StatsData> damType;
 
