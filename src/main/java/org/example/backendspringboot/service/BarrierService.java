@@ -18,4 +18,6 @@ public interface BarrierService extends IService<Barrier> {
     Barrier findLikeName(String damName);
 
     BarrierStatsDto dataStats(BarrierForm form);
+
+    List<Barrier> dataSync(BarrierForm form);
 }

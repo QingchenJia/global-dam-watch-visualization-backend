@@ -23,7 +23,13 @@ public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> impl
 
     @Override
     public List<Barrier> loadAllLocation() {
-        return baseMapper.selectAllLocation();
+        LambdaQueryWrapper<Barrier> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(
+                Barrier::getGdwId,
+                Barrier::getDamName,
+                Barrier::getDamType
+        );
+        return baseMapper.selectGeoByCustomCondition(queryWrapper);
     }
 
     @Override
@@ -33,8 +39,11 @@ public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> impl
 
     @Override
     public Barrier findLikeName(String damName) {
-        List<Barrier> barrierIds = baseMapper.selectLikeName(damName);
-        return barrierIds.getFirst();
+        LambdaQueryWrapper<Barrier> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(Barrier::getGdwId, Barrier::getDamName)
+                .like(Barrier::getDamName, damName)
+                .last("LIMIT 1");
+        return getOne(queryWrapper);
     }
 
     @Override
@@ -72,12 +81,68 @@ public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> impl
         List<Barrier> barriers = list(queryWrapper);
 
         List<StatsData> damType = StatsUtils.formatStats(barriers, Barrier::getDamType);
-        List<StatsData> powerMw = StatsUtils.formatStats(barriers, Barrier::getPowerMw);
+
+        List<StatsData> powerMw = StatsUtils.statsFieldRange(
+                barriers,
+                Barrier::getPowerMw,
+                value -> {
+                    if (value < 1) return "<1";
+                    if (value < 10) return "1-10";
+                    if (value < 100) return "10-100";
+                    if (value < 1000) return "100-1000";
+                    return ">1000";
+                }
+        );
+
         List<StatsData> mainUse = StatsUtils.formatStats(barriers, Barrier::getMainUse);
         List<StatsData> quality = StatsUtils.formatStats(barriers, Barrier::getQuality);
-        List<StatsData> yearDam = StatsUtils.formatStats(barriers, Barrier::getYearDam);
+
+        List<StatsData> yearDam = StatsUtils.statsFieldRange(
+                barriers,
+                Barrier::getYearDam,
+                value -> {
+                    if (value < 1900) return "<1900";
+                    if (value < 1920) return "1900-1920";
+                    if (value < 1940) return "1920-1940";
+                    if (value < 1960) return "1940-1960";
+                    if (value < 1980) return "1960-1980";
+                    if (value < 2000) return "1980-2000";
+                    return ">2000";
+                }
+        );
+
         List<StatsData> country = StatsUtils.formatStats(barriers, Barrier::getCountry);
 
         return new BarrierStatsDto(count, damType, powerMw, mainUse, quality, yearDam, country);
+    }
+
+    @Override
+    public List<Barrier> dataSync(BarrierForm form) {
+        LambdaQueryWrapper<Barrier> queryWrapper = new LambdaQueryWrapper<>();
+
+        queryWrapper.in(form.getDamType() != null, Barrier::getDamType, form.getDamType())
+                .in(form.getMainBasin() != null, Barrier::getMainBasin, form.getMainBasin())
+                .in(form.getMainUse() != null, Barrier::getMainUse, form.getMainUse())
+                .in(form.getCountry() != null, Barrier::getCountry, form.getCountry())
+                .in(form.getQuality() != null, Barrier::getQuality, form.getQuality());
+
+        if (form.getYear() != null && form.getYear().getFirst() != null && form.getYear().getLast() != null) {
+            queryWrapper.between(
+                    Barrier::getYearDam,
+                    form.getYear().getFirst(),
+                    form.getYear().getLast()
+            );
+        }
+
+        queryWrapper = StatsUtils.setRange(queryWrapper, Barrier::getDamLenM, form.getDamLenM());
+        queryWrapper = StatsUtils.setRange(queryWrapper, Barrier::getDamHgtM, form.getDamHgtM());
+
+        queryWrapper.select(
+                Barrier::getGdwId,
+                Barrier::getDamName,
+                Barrier::getDamType
+        );
+
+        return baseMapper.selectGeoByCustomCondition(queryWrapper);
     }
 }

@@ -18,4 +18,6 @@ public interface ReservoirService extends IService<Reservoir> {
     Reservoir findLikeName(String resName);
 
     ReservoirStatsDto dataStats(ReservoirForm form);
+
+    List<Reservoir> dataSync(ReservoirForm form);
 }

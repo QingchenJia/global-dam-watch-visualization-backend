@@ -45,4 +45,9 @@ public class BarrierController {
     public Result<BarrierStatsDto> dataStats(@RequestBody BarrierForm form) {
         return Result.success(barrierService.dataStats(form));
     }
+
+    @PostMapping("/sync")
+    public Result<List<Barrier>> syncData(@RequestBody BarrierForm form) {
+        return Result.success(barrierService.dataSync(form));
+    }
 }

@@ -45,4 +45,9 @@ public class ReservoirController {
     public Result<ReservoirStatsDto> dataStats(@RequestBody ReservoirForm form) {
         return Result.success(reservoirService.dataStats(form));
     }
+
+    @PostMapping("/sync")
+    public Result<List<Reservoir>> syncData(@RequestBody ReservoirForm form) {
+        return Result.success(reservoirService.dataSync(form));
+    }
 }
