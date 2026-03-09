@@ -13,12 +13,17 @@ import java.util.List;
 @Mapper
 public interface BarrierMapper extends BaseMapper<Barrier> {
 
-    @Select("${sql}")
-    List<Barrier> executeSql(@Param("sql") String sql);
+    @Select("""
+            SELECT  
+            gdw_id,ST_AsGeoJSON(wkb_geometry) AS wkb_geometry,dam_type,dam_name 
+            FROM public.gdw_barrier 
+            WHERE ${condition}
+            """)
+    List<Barrier> executeSql(@Param("condition") String condition);
 
     @Select("""
             SELECT 
-            res_name,dam_name,alt_name,dam_type,lake_ctrl,river,alt_river,main_basin,sub_basin,country,sec_cntry,admin_unit,sec_admin,near_city,alt_city,year_dam,pre_year,year_src,alt_year,rem_year,timeline,year_txt,dam_hgt_m,alt_hgt_m,dam_len_m,alt_len_m,area_skm,area_poly,area_rep,area_max,area_min,cap_mcm,cap_max,cap_rep,cap_min,depth_m,dis_avg_ls,dor_pc,elev_masl,catch_skm,catch_rep,power_mw,data_info,use_irri,use_elec,use_supp,use_fcon,use_recr,use_navi,use_fish,use_pcon,use_live,use_othr,main_use,multi_dams,comments,url,quality,editor,long_riv,lat_riv,long_dam,lat_dam,orig_src,poly_src,instream 
+            res_name,dam_name,alt_name,dam_type,lake_ctrl,river,alt_river,main_basin,sub_basin,country,sec_cntry,admin_unit,sec_admin,near_city,alt_city,year_dam,pre_year,year_src,alt_year,rem_year,timeline,year_txt,dam_hgt_m,alt_hgt_m,dam_len_m,alt_len_m,area_skm,area_poly,area_rep,area_max,area_min,cap_mcm,cap_max,cap_rep,cap_min,depth_m,dis_avg_ls,dor_pc,elev_masl,catch_skm,catch_rep,power_mw,data_info,use_irri,use_elec,use_supp,use_fcon,use_recr,use_navi,use_fish,use_pcon,use_live,use_othr,main_use,multi_dams,comments,url,quality,editor,long_riv,lat_riv,long_dam,lat_dam,orig_src,poly_src,instream,hybas_l12 
             FROM public.gdw_barrier 
             WHERE gdw_id=#{gdw_id};
             """)
