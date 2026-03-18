@@ -17,8 +17,14 @@ import java.util.List;
 public class ReservoirServiceImpl extends ServiceImpl<ReservoirMapper, Reservoir> implements ReservoirService {
 
     @Override
-    public List<Reservoir> databaseOperation(String sql) {
-        return baseMapper.executeSql(sql);
+    public List<Reservoir> databaseOperation(String condition) {
+        LambdaQueryWrapper<Reservoir> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(
+                Reservoir::getGdwId,
+                Reservoir::getResName,
+                Reservoir::getYearDam
+        );
+        return baseMapper.executeSql(queryWrapper, condition);
     }
 
     @Override
@@ -26,7 +32,8 @@ public class ReservoirServiceImpl extends ServiceImpl<ReservoirMapper, Reservoir
         LambdaQueryWrapper<Reservoir> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(
                 Reservoir::getGdwId,
-                Reservoir::getResName
+                Reservoir::getResName,
+                Reservoir::getYearDam
         );
         return baseMapper.selectGeoByCustomCondition(queryWrapper);
     }
@@ -39,7 +46,7 @@ public class ReservoirServiceImpl extends ServiceImpl<ReservoirMapper, Reservoir
     @Override
     public Reservoir findLikeName(String resName) {
         LambdaQueryWrapper<Reservoir> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(Reservoir::getGdwId, Reservoir::getResName)
+        queryWrapper.select(Reservoir::getGdwId, Reservoir::getResName, Reservoir::getYearDam)
                 .like(Reservoir::getResName, resName)
                 .last("LIMIT 1");
         return getOne(queryWrapper);
@@ -147,7 +154,8 @@ public class ReservoirServiceImpl extends ServiceImpl<ReservoirMapper, Reservoir
 
         queryWrapper.select(
                 Reservoir::getGdwId,
-                Reservoir::getResName
+                Reservoir::getResName,
+                Reservoir::getYearDam
         );
 
         return baseMapper.selectGeoByCustomCondition(queryWrapper);

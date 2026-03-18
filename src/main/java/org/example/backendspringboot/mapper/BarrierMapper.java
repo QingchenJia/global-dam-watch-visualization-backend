@@ -15,11 +15,11 @@ public interface BarrierMapper extends BaseMapper<Barrier> {
 
     @Select("""
             SELECT  
-            gdw_id,ST_AsGeoJSON(wkb_geometry) AS wkb_geometry,dam_type,dam_name 
+            ${ew.sqlSelect},ST_AsGeoJSON(wkb_geometry) AS wkb_geometry 
             FROM public.gdw_barrier 
             WHERE ${condition}
             """)
-    List<Barrier> executeSql(@Param("condition") String condition);
+    List<Barrier> executeSql(@Param(Constants.WRAPPER) Wrapper<Barrier> wrapper, @Param("condition") String condition);
 
     @Select("""
             SELECT 

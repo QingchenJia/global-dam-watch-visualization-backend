@@ -17,8 +17,15 @@ import java.util.List;
 public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> implements BarrierService {
 
     @Override
-    public List<Barrier> databaseOperation(String sql) {
-        return baseMapper.executeSql(sql);
+    public List<Barrier> databaseOperation(String condition) {
+        LambdaQueryWrapper<Barrier> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(
+                Barrier::getGdwId,
+                Barrier::getDamName,
+                Barrier::getDamType,
+                Barrier::getYearDam
+        );
+        return baseMapper.executeSql(queryWrapper, condition);
     }
 
     @Override
@@ -27,7 +34,8 @@ public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> impl
         queryWrapper.select(
                 Barrier::getGdwId,
                 Barrier::getDamName,
-                Barrier::getDamType
+                Barrier::getDamType,
+                Barrier::getYearDam
         );
         return baseMapper.selectGeoByCustomCondition(queryWrapper);
     }
@@ -140,7 +148,8 @@ public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> impl
         queryWrapper.select(
                 Barrier::getGdwId,
                 Barrier::getDamName,
-                Barrier::getDamType
+                Barrier::getDamType,
+                Barrier::getYearDam
         );
 
         return baseMapper.selectGeoByCustomCondition(queryWrapper);

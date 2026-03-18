@@ -15,11 +15,11 @@ public interface ReservoirMapper extends BaseMapper<Reservoir> {
 
     @Select("""
             SELECT  
-            gdw_id,ST_AsGeoJSON(wkb_geometry) AS wkb_geometry,res_name 
+            ${ew.sqlSelect},ST_AsGeoJSON(wkb_geometry) AS wkb_geometry
             FROM public.gdw_reservoir 
             WHERE ${condition}
             """)
-    List<Reservoir> executeSql(@Param("condition") String condition);
+    List<Reservoir> executeSql(@Param(Constants.WRAPPER) Wrapper<Reservoir> wrapper, @Param("condition") String condition);
 
     @Select("""
             SELECT 
