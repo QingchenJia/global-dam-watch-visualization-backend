@@ -50,6 +50,7 @@ public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> impl
         LambdaQueryWrapper<Barrier> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(Barrier::getGdwId, Barrier::getDamName)
                 .like(Barrier::getDamName, damName)
+                // 获取一条数据
                 .last("LIMIT 1");
         return getOne(queryWrapper);
     }
@@ -77,6 +78,12 @@ public class BarrierServiceImpl extends ServiceImpl<BarrierMapper, Barrier> impl
 
         // 统计符合查询条件的数据总数
         long count = count(queryWrapper);
+
+        // 如果没有符合条件的数据则返回空
+        if (count == 0) {
+            return new BarrierStatsDto(0, null, null, null, null, null, null);
+        }
+
         queryWrapper.select(
                 Barrier::getDamType,
                 Barrier::getPowerMw,

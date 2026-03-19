@@ -48,6 +48,7 @@ public class ReservoirServiceImpl extends ServiceImpl<ReservoirMapper, Reservoir
         LambdaQueryWrapper<Reservoir> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(Reservoir::getGdwId, Reservoir::getResName, Reservoir::getYearDam)
                 .like(Reservoir::getResName, resName)
+                // 获取一条数据
                 .last("LIMIT 1");
         return getOne(queryWrapper);
     }
@@ -74,6 +75,12 @@ public class ReservoirServiceImpl extends ServiceImpl<ReservoirMapper, Reservoir
         queryWrapper = StatsUtils.setRange(queryWrapper, Reservoir::getDepthM, form.getDepthM());
 
         long count = count(queryWrapper);
+
+        // 如果没有符合条件的数据则返回空
+        if (count == 0) {
+            return new ReservoirStatsDto(0, null, null, null, null, null, null);
+        }
+
         queryWrapper.select(
                 Reservoir::getCapMcm,
                 Reservoir::getAreaSkm,
