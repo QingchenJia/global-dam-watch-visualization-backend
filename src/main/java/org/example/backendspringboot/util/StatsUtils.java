@@ -62,11 +62,9 @@ public class StatsUtils {
                 })
                 .collect(
                         Collectors.groupingBy(
-                                /*
-                                 * 数据库中各数值类型不统一
-                                 * 均通过字符串中介转换成双精度浮点数类型进行比较
-                                 * 避免类型不符丢失统计数
-                                 * */
+                                // 数据库中各数值类型不统一
+                                // 均通过字符串中介转换成双精度浮点数类型进行比较
+                                // 避免类型不符丢失统计数
                                 data -> rule.apply(NumberUtils.toDouble(String.valueOf(getField.apply(data)))),
                                 Collectors.counting()
                         ));

@@ -1,14 +1,27 @@
 server:
   port: 8100
 spring:
+  profiles:
+    active: dev
   application:
     name: backend-springboot
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://192.168.16.100:5432/gdw
-    username: postgres
-    password: postgres
+    url: ${postgresql.url}
+    username: ${postgresql.username}
+    password: ${postgresql.password}
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
+llm:
+  providers:
+    - name: cloud
+      base-url: ${llm-config.cloud.base-url}
+      api-key: ${llm-config.cloud.api-key}
+    - name: local
+      base-url: ${llm-config.local.base-url}
+      api-key: ${llm-config.local.api-key}
+    - name: chat
+      base-url: ${llm-config.chat.base-url}
+      api-key: ${llm-config.chat.api-key}
