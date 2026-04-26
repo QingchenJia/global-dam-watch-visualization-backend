@@ -43,7 +43,34 @@ public class LlmProxyController {
 
         // 记录llm代理请求日志以显示代理请求的模式和使用的大模型
         log.info(
-                "[LLM]请求成功！模式：{}|模型：{}",
+                "[Chat]请求成功！模式：{}|模型：{}",
+                provider,
+                objectMapper.readTree(body).get("model").asText()
+        );
+
+        return mono;
+    }
+
+    @PostMapping("/{provider}/embeddings")
+    public Mono<ResponseEntity<String>> embeddings(
+            @PathVariable String provider,
+            @RequestBody String body
+    ) throws JsonProcessingException {
+        WebClient client = llmWebClients.get(provider);
+
+        if (client == null) {
+            return Mono.just(ResponseEntity.badRequest()
+                    .body("{\"error\": \"Unknown provider: " + provider + "\"}"));
+        }
+
+        Mono<ResponseEntity<String>> mono = client.post()
+                .uri("/embeddings")
+                .bodyValue(body)
+                .retrieve()
+                .toEntity(String.class);
+
+        log.info(
+                "[Embedding]请求成功！模式：{}|模型：{}",
                 provider,
                 objectMapper.readTree(body).get("model").asText()
         );

@@ -25,3 +25,6 @@ llm:
     - name: chat
       base-url: ${llm-config.chat.base-url}
       api-key: ${llm-config.chat.api-key}
+    - name: rag
+      base-url: ${llm-config.rag.base-url}
+      api-key: ${llm-config.rag.api-key}
