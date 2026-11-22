@@ -1,77 +1,104 @@
-# Global Dam Watch Visualization Backend
+<div align="center">
 
-Global Dam Watch（GDW）可视化项目的 Spring Boot 后端。服务基于 PostgreSQL/PostGIS 管理全球水库与大坝数据，为前端提供空间位置、详情查询、条件筛选、聚合统计和地图数据同步接口，同时提供兼容 OpenAI API 格式的多供应商 LLM 请求代理。
+# 🌊 Global Dam Watch Visualization — Backend
 
-## 主要功能
+**全球大坝与水库三维可视化系统 · 后端服务**
 
-- 水库（面要素）和大坝（点要素）的 GeoJSON 位置数据查询
-- 按 GDW ID 查询完整属性
-- 按名称模糊定位水库或大坝
-- 按分类、年份和数值区间筛选数据
-- 按容量、面积、用途、质量、年份、国家等维度生成统计结果
-- 将筛选结果同步为地图所需的精简空间数据
-- 将聊天补全和向量化请求代理到多个 OpenAI 兼容服务
-- 提供可直接导入 PostgreSQL 的 GDW 数据脚本
+> 🎓 **武汉科技大学 · 计算机科学与技术学院 · 2026 届本科毕业设计代码**
 
-## 技术栈
+[![WUST](https://img.shields.io/badge/武汉科技大学-计算机科学与技术学院_2026届本科毕业设计-B31B1B?style=for-the-badge&logo=academia&logoColor=white)](#项目背景)
 
-| 组件                 | 当前版本或用途       |
-| -------------------- | -------------------- |
-| Java                 | 21                   |
-| Spring Boot          | 3.4.12               |
-| Spring Web           | REST API             |
-| Spring WebFlux       | `WebClient` LLM 代理 |
-| MyBatis-Plus         | 3.5.14               |
-| PostgreSQL / PostGIS | 业务数据与空间查询   |
-| Lombok               | 1.18.42              |
-| Maven                | 构建与依赖管理       |
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=flat-square&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.4.12-6DB33F?style=flat-square&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![MyBatis-Plus](https://img.shields.io/badge/MyBatis--Plus-3.5.14-2B74B9?style=flat-square)](https://baomidou.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-PostGIS-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://postgis.net/)
+[![Spring WebFlux](https://img.shields.io/badge/WebFlux-LLM_Proxy-6DB33F?style=flat-square&logo=spring&logoColor=white)](https://spring.io/)
+[![Maven](https://img.shields.io/badge/Maven-3.9+-C71A36?style=flat-square&logo=apachemaven&logoColor=white)](https://maven.apache.org/)
 
-项目未包含 Maven Wrapper，运行构建命令前需在本机安装 Maven。
+[✨ 核心功能](#-核心功能) · [🏗️ 系统架构](#️-系统架构) · [🚀 快速开始](#-快速开始) · [📡 接口文档](#-接口文档) · [📁 目录结构](#-目录结构)
 
-## 项目结构
+</div>
 
-```text
-backend-springboot/
-├─ data/                       # 数据库建表、数据和索引脚本
-├─ src/main/java/org/example/backendspringboot/
-│  ├─ common/                  # 统一响应、区间、统计与 LLM 配置模型
-│  ├─ config/                  # WebClient 配置
-│  ├─ controller/              # 水库、大坝和 LLM 代理接口
-│  ├─ dto/                     # 筛选表单与统计响应 DTO
-│  ├─ entity/                  # gdw_reservoir、gdw_barrier 实体
-│  ├─ mapper/                  # MyBatis-Plus Mapper 与空间 SQL
-│  ├─ service/                 # 业务接口及实现
-│  └─ util/                    # 统计与区间条件工具
-├─ src/main/resources/
-│  └─ application.yml          # 公共配置，默认启用 dev Profile
-├─ pom.xml
-└─ README.md
+---
+
+## 🎓 项目背景
+
+> [!NOTE]
+> 本仓库为 **武汉科技大学计算机科学与技术学院 2026 届本科毕业设计** 的后端服务端源码。  
+> 基于 **Global Dam Watch (GDW)** 全球水库与大坝公开数据集，结合 **Spring Boot + PostgreSQL / PostGIS** 实现大规模地理空间数据的管理、条件筛选与多维聚合统计，并通过 **Spring WebFlux** 提供兼容 OpenAI API 协议的多源大语言模型（LLM）安全代理，支撑前端三维地球可视化与 GIS 智能体交互。
+
+---
+
+## ✨ 核心功能
+
+| 模块 | 功能亮点 |
+| :--- | :--- |
+| 🌍 **空间位置服务** | 基于 PostGIS `ST_AsGeoJSON` 实时输出全球 **35,295** 座水库（面要素）与 **41,145** 座大坝（点要素）的轻量化 GeoJSON 数据 |
+| 🔍 **详情与模糊检索** | 支持按 `gdw_id` 查询完整工程属性，以及按水库/大坝名称进行模糊搜索与快速定位 |
+| 🎯 **多维条件筛选** | 支持按流域、主要用途、数据质量、建成年份、国家/地区，以及库容、面积、水深、坝长、坝高等数值区间组合查询 |
+| 📊 **多维统计分析** | 按库容、面积、装机功率、主要用途、质量等级、年代区间、国家分布等维度动态生成聚合统计数据 |
+| 🗺️ **地图数据同步** | 将结构化筛选条件或智能体生成的筛选结果实时同步为前端 Cesium 所需的精简空间数据集 |
+| 🤖 **多源 LLM 安全代理** | 统一代理 OpenAI 兼容格式的 `/chat/completions` 与 `/embeddings` 请求，支持 `cloud`、`local`、`chat`、`rag` 多通道隔离鉴权 |
+| 💾 **开箱即用数据集** | 内置 `data/` 目录提供可直接导入 PostgreSQL/PostGIS 的建表、全量数据与空间索引 SQL 脚本 |
+
+---
+
+## 🏗️ 系统架构
+
+```mermaid
+flowchart LR
+    FE["🌐 Vue 3 + CesiumJS 前端"] -->|"REST API (JSON / GeoJSON)"| CTRL["⚙️ Spring Boot Controllers<br/>Barrier / Reservoir / LlmProxy"]
+    CTRL -->|"业务处理 & 区间聚合"| SVC["🧩 Service & StatsUtils"]
+    SVC -->|"MyBatis-Plus & PostGIS SQL"| DB[("🐘 PostgreSQL + PostGIS<br/>gdw_barrier (41,145)<br/>gdw_reservoir (35,295)")]
+    CTRL -->|"WebClient 透传鉴权"| LLM["🤖 OpenAI-Compatible Providers<br/>cloud / local / chat / rag"]
 ```
 
-当前仓库未跟踪测试目录；`target/` 为 Maven 构建产物，不属于源码。
+---
 
-## 环境要求
+## 🛠️ 技术栈
 
-- JDK 21
-- Maven 3.9 或兼容版本
-- PostgreSQL（数据脚本来源版本为 PostgreSQL 14）
-- PostGIS 扩展
-- 可选：一个或多个兼容 OpenAI `/chat/completions`、`/embeddings` 接口的 LLM 服务
+| 类别 | 技术组件 | 版本 / 用途 |
+| :--- | :--- | :--- |
+| **核心语言** | Java | `21` (LTS) |
+| **应用框架** | Spring Boot | `3.4.12` |
+| **Web 接口** | Spring Web | RESTful API 服务 |
+| **响应式代理** | Spring WebFlux | 基于 `WebClient` 的 LLM 请求转发 |
+| **持久层** | MyBatis-Plus | `3.5.14` ORM 与自定义空间 SQL |
+| **空间数据库** | PostgreSQL / PostGIS | 业务属性存储与地理空间查询 |
+| **开发提效** | Lombok / Commons-Lang3 | `1.18.42` / `3.18.0` |
+| **构建工具** | Apache Maven | 依赖管理与项目打包 |
 
-应用默认监听 `8100` 端口，并在启动时启用 `dev` Profile。
+> [!TIP]
+> 本项目未内置 Maven Wrapper（`mvnw`），运行构建或启动命令前请确保本机已安装并配置好 Maven。
 
-## 数据库初始化
+---
 
-`data/` 中包含当前项目使用的两张表及数据：
+## 📋 环境要求
 
-| 表                     | 空间类型                  | 数据量 | 脚本                                                                 |
-| ---------------------- | ------------------------- | -----: | -------------------------------------------------------------------- |
-| `public.gdw_barrier`   | `POINT, SRID 4326`        | 41,145 | `gdw_barrier.sql`                                                    |
-| `public.gdw_reservoir` | `MULTIPOLYGON, SRID 4326` | 35,295 | `gdw_reservoir_00_schema.sql`、`01`～`05_data.sql`、`99_indexes.sql` |
+- **JDK**：`21` 或以上
+- **Maven**：`3.9+` 或兼容版本
+- **数据库**：PostgreSQL（数据脚本导出来源为 PostgreSQL 14）+ **PostGIS** 空间扩展
+- **可选依赖**：一个或多个兼容 OpenAI `/chat/completions`、`/embeddings` 协议的大模型服务（如云端 API 或本地 Ollama / vLLM）
 
-> 注意：建表脚本包含 `DROP TABLE IF EXISTS`，重复执行会删除同名表及其中已有数据。请先确认目标数据库并做好备份。
+默认服务监听端口为 **`8100`**，启动时自动激活 **`dev`** Profile。
 
-脚本中的主键默认值依赖 `gdw_barrier_ogc_fid_seq` 和 `gdw_reservoir_ogc_fid_seq`，但脚本本身不会创建这两个序列。首次导入前需要先创建 PostGIS 扩展和序列：
+---
+
+## 🚀 快速开始
+
+### 1. 初始化 PostgreSQL / PostGIS 数据库
+
+`data/` 目录内置了项目所需的两张核心空间数据表：
+
+| 数据表 | 几何类型 | 记录数 | 对应 SQL 脚本 |
+| :--- | :--- | ---: | :--- |
+| `public.gdw_barrier` | `POINT, SRID 4326` | `41,145` | `gdw_barrier.sql` |
+| `public.gdw_reservoir` | `MULTIPOLYGON, SRID 4326` | `35,295` | `gdw_reservoir_00_schema.sql`、`01`～`05_data.sql`、`99_indexes.sql` |
+
+> [!CAUTION]
+> 建表脚本中包含 `DROP TABLE IF EXISTS` 语句，重复执行会清空同名表中的已有数据，执行前请务必确认目标数据库并做好备份。
+
+脚本主键依赖 `gdw_barrier_ogc_fid_seq` 与 `gdw_reservoir_ogc_fid_seq` 序列，首次导入前请先在目标库中启用 PostGIS 扩展并创建序列：
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS postgis;
@@ -79,7 +106,7 @@ CREATE SEQUENCE IF NOT EXISTS public.gdw_barrier_ogc_fid_seq;
 CREATE SEQUENCE IF NOT EXISTS public.gdw_reservoir_ogc_fid_seq;
 ```
 
-使用 `psql` 导入时，按以下顺序执行：
+随后按顺序使用 `psql` 导入数据（假设数据库名为 `gdw`）：
 
 ```bash
 psql -d gdw -f data/gdw_barrier.sql
@@ -92,34 +119,38 @@ psql -d gdw -f data/gdw_reservoir_05_data.sql
 psql -d gdw -f data/gdw_reservoir_99_indexes.sql
 ```
 
-其中 `99_indexes.sql` 应在全部水库数据导入后执行，以创建空间索引和主键约束。
+> [!TIP]
+> `gdw_reservoir_99_indexes.sql` 务必在全部水库分片数据导入完成后执行，用于构建主键约束与 GIST 空间索引。
 
-## 应用配置
+---
 
-公共配置位于 `src/main/resources/application.yml`。该文件默认读取外部数据库和 LLM 参数，并启用 `dev` Profile。建议在本地新建 `src/main/resources/application-dev.yml`；该文件已被 `.gitignore` 忽略，不应提交数据库密码或 API Key。
+### 2. 配置数据库与大模型参数
+
+公共配置位于 `src/main/resources/application.yml`（默认启用 `dev` Profile）。  
+请在 `src/main/resources/application-dev.yml` 中填入实际的数据库与大模型参数（该文件已被 `.gitignore` 忽略，避免泄露真实密钥）：
 
 ```yaml
 postgresql:
-    url: jdbc:postgresql://localhost:5432/gdw
-    username: postgres
-    password: change_me
+  url: jdbc:postgresql://localhost:5432/gdw
+  username: postgres
+  password: <your-db-password>
 
 llm-config:
-    cloud:
-        base-url: https://api.example.com/v1
-        api-key: change_me
-    local:
-        base-url: http://localhost:11434/v1
-        api-key: change_me
-    chat:
-        base-url: https://api.example.com/v1
-        api-key: change_me
-    rag:
-        base-url: https://api.example.com/v1
-        api-key: change_me
+  cloud:
+    base-url: https://api.example.com/v1
+    api-key: <your-cloud-llm-api-key>
+  local:
+    base-url: http://localhost:11434/v1
+    api-key: <your-local-llm-api-key>
+  chat:
+    base-url: https://api.example.com/v1
+    api-key: <your-chat-llm-api-key>
+  rag:
+    base-url: https://api.example.com/v1
+    api-key: <your-rag-llm-api-key>
 ```
 
-也可以通过环境变量提供配置。Spring Boot 会将大写下划线形式映射到配置键：
+也可以通过系统环境变量覆盖配置（Spring Boot 自动将大写下划线映射为配置键）：
 
 ```powershell
 $env:POSTGRESQL_URL = "jdbc:postgresql://localhost:5432/gdw"
@@ -129,159 +160,171 @@ $env:LLM_CONFIG_LOCAL_BASE_URL = "http://localhost:11434/v1"
 $env:LLM_CONFIG_LOCAL_API_KEY = "change_me"
 ```
 
-`application.yml` 当前固定声明了 `cloud`、`local`、`chat`、`rag` 四个 Provider，因此启动时四组占位符都需要能够解析。若只使用部分 Provider，可在本地 Profile 中覆盖 `llm.providers` 列表，或为其余 Provider 提供占位配置。
+> [!IMPORTANT]
+> `application.yml` 固定声明了 `cloud`、`local`、`chat`、`rag` 四个 Provider，启动时四组占位符均需可解析。如仅使用部分模型，可在本地 Profile 覆盖 `llm.providers` 或为其余项保留占位值。
 
-## 启动与构建
+---
 
-在项目根目录执行：
+### 3. 启动与打包
 
 ```bash
 # 开发模式启动
 mvn spring-boot:run
 
-# 运行测试并打包
+# 编译并打包
 mvn clean package
 
-# 运行构建产物
+# 跳过测试快速打包
+mvn -DskipTests package
+
+# 运行打包产物
 java -jar target/backend-springboot-0.0.1-SNAPSHOT.jar
 ```
 
-服务启动后基础地址为：
+启动成功后，服务访问地址为：`http://localhost:8100`
+
+---
+
+## 📡 接口文档
+
+### 统一响应格式
+
+水库与大坝业务接口统一封装为 `Result<T>`（`code` 为 `1` 表示成功，`0` 表示失败）；LLM 代理接口直接透传上游服务的原始响应体与 HTTP 状态码。
+
+```json
+{
+  "code": 1,
+  "message": "success",
+  "data": {}
+}
+```
+
+### 💧 水库接口 (`/reservoir`)
+
+| 方法 | 路径 | 请求体 | 返回说明 |
+| :---: | :--- | :--- | :--- |
+| `GET` | `/reservoir/location` | 无 | 全部水库的 `gdwId`、`resName`、`yearDam` 及 GeoJSON |
+| `GET` | `/reservoir/{id}` | 无 | 指定 `gdw_id` 的水库完整属性及 GeoJSON |
+| `POST` | `/reservoir/position` | 纯文本水库名称 | 模糊匹配到的第一条水库记录 |
+| `POST` | `/reservoir/filter` | 纯文本 SQL 条件 | 满足条件的精简空间位置数据 |
+| `POST` | `/reservoir/stats` | `ReservoirForm` JSON | 筛选后的总量及多维度分组统计 |
+| `POST` | `/reservoir/sync` | `ReservoirForm` JSON | 筛选后的精简地图同步数据 |
+
+<details>
+<summary>📌 点击查看 <code>/reservoir/stats</code> 与 <code>/reservoir/sync</code> 请求体示例</summary>
+
+```json
+{
+  "capMcm": { "eq": -1, "gt": -1, "ge": 10, "lt": -1, "le": 1000 },
+  "areaSkm": null,
+  "mainBasin": ["Yangtze"],
+  "mainUse": ["Irrigation"],
+  "quality": ["2: Good"],
+  "year": [1950, 2020],
+  "country": ["China"],
+  "depthM": null
+}
+```
+
+> 响应 `data` 包含 `total`、`capMcm`、`areaSkm`、`mainUse`、`quality`、`yearDam`、`country`，每个分组项为 `{ "name": "分组", "value": 数量 }`。
+
+</details>
+
+### 🧱 大坝接口 (`/barrier`)
+
+| 方法 | 路径 | 请求体 | 返回说明 |
+| :---: | :--- | :--- | :--- |
+| `GET` | `/barrier/location` | 无 | 全部大坝的 `gdwId`、`damName`、`damType`、`yearDam` 及 GeoJSON |
+| `GET` | `/barrier/{id}` | 无 | 指定 `gdw_id` 的大坝完整属性详情 |
+| `POST` | `/barrier/position` | 纯文本大坝名称 | 模糊匹配到的第一条大坝记录 |
+| `POST` | `/barrier/filter` | 纯文本 SQL 条件 | 满足条件的精简空间位置数据 |
+| `POST` | `/barrier/stats` | `BarrierForm` JSON | 筛选后的总量及多维度分组统计 |
+| `POST` | `/barrier/sync` | `BarrierForm` JSON | 筛选后的精简地图同步数据 |
+
+<details>
+<summary>📌 点击查看 <code>/barrier/stats</code> 与 <code>/barrier/sync</code> 请求体示例</summary>
+
+```json
+{
+  "damType": ["Dam"],
+  "damLenM": null,
+  "mainBasin": ["Yangtze"],
+  "mainUse": ["Hydroelectricity"],
+  "quality": ["2: Good"],
+  "year": [1950, 2020],
+  "country": ["China"],
+  "damHgtM": { "eq": -1, "gt": 20, "ge": -1, "lt": -1, "le": -1 }
+}
+```
+
+> 响应 `data` 包含 `total`、`damType`、`powerMw`、`mainUse`、`quality`、`yearDam`、`country`。
+
+</details>
+
+#### 📐 数值区间筛选规则 (`RangeData`)
+
+`capMcm`、`areaSkm`、`depthM`、`damLenM`、`damHgtM` 共用同一区间结构：
+
+| 字段 | `eq` | `gt` | `ge` | `lt` | `le` |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| **含义** | 等于 (`=`) | 大于 (`>`) | 大于等于 (`>=`) | 小于 (`<`) | 小于等于 (`<=`) |
+
+- 某字段值为 `-1` 表示不启用该条件；整个区间对象为 `null` 表示不对该指标筛选。
+- `year` 接收 `[起始年份, 结束年份]` 闭区间数组。
+
+### 🤖 LLM 代理接口 (`/api/llm`)
+
+| 方法 | 路径 | 说明 |
+| :---: | :--- | :--- |
+| `POST` | `/api/llm/{provider}/chat/completions` | 转发至对应 Provider 的 `/chat/completions` |
+| `POST` | `/api/llm/{provider}/embeddings` | 转发至对应 Provider 的 `/embeddings` |
+
+- `provider` 支持 `cloud`、`local`、`chat`、`rag`；未知 Provider 返回 `HTTP 400`。
+- 代理自动附加 `Authorization: Bearer <api-key>` 与 `Content-Type: application/json`。
+- `base-url` 需包含公共 API 前缀（通常为 `/v1`），无需包含 `/chat/completions` 或 `/embeddings`。
+
+> [!WARNING]
+> **安全提示**：`/reservoir/filter` 与 `/barrier/filter` 会将请求体作为 SQL `WHERE` 条件拼接执行（用于配合前端 GIS 智能体动态筛选），存在 SQL 注入风险，仅限本地开发或可信内网调用。生产部署前请务必增加鉴权、字段白名单校验、收紧 `@CrossOrigin(origins = "*")` 跨域范围，并关闭 MyBatis `StdOutImpl` 控制台 SQL 日志。
+
+---
+
+## 📁 目录结构
 
 ```text
-http://localhost:8100
+global-dam-watch-visualization-backend/
+├─ data/                                          # PostGIS 建表、全量数据与索引 SQL 脚本
+├─ src/main/
+│  ├─ java/org/example/backendspringboot/
+│  │  ├─ common/                                  # 统一响应、区间模型、统计结构与 LLM 配置类
+│  │  ├─ config/                                  # WebClient 多 Provider 注册配置
+│  │  ├─ controller/                              # Barrier / Reservoir / LlmProxy 控制器
+│  │  ├─ dto/                                     # 筛选表单与统计结果传输对象
+│  │  ├─ entity/                                  # gdw_barrier 与 gdw_reservoir 数据实体
+│  │  ├─ mapper/                                  # MyBatis-Plus Mapper 与空间查询 SQL
+│  │  ├─ service/                                 # 业务接口及实现类
+│  │  └─ util/                                    # 统计分组与区间查询工具类
+│  └─ resources/
+│     ├─ application.yml                          # 公共配置（默认启用 dev Profile）
+│     └─ application-dev.yml                      # 本地开发配置（含数据库与 LLM 占位符，已忽略）
+├─ pom.xml                                        # Maven 项目配置
+└─ README.md
 ```
 
-## 统一响应格式
+---
 
-水库和大坝接口返回 `Result<T>`：
+## 📝 实现细节说明
 
-```json
-{
-    "code": 1,
-    "message": "success",
-    "data": {}
-}
-```
+- **空间几何转换**：水库 `wkb_geometry` 在位置与详情接口均经 `ST_AsGeoJSON` 转换；大坝 `wkb_geometry` 在位置与筛选接口转换，详情接口默认不返回几何字段。
+- **统计清洗规则**：分类统计自动过滤空字符串与缺失值标记 `-99`，区间统计同样忽略 `-99`。
+- **预置统计分桶**：
+  - 库容 / 面积 / 装机功率：`<1`、`1-10`、`10-100`、`100-1000`、`>1000`
+  - 建成年份：`<1900`、`1900-1920`、`1920-1940`、`1940-1960`、`1960-1980`、`1980-2000`、`>2000`
 
-`code` 为 `1` 表示成功、`0` 表示错误。LLM 代理接口不使用该结构，而是直接透传上游服务的响应体和状态。
+---
 
-## 水库接口
+<div align="center">
 
-基础路径：`/reservoir`
+**Global Dam Watch Visualization Backend**  
+🎓 武汉科技大学计算机科学与技术学院 2026 届本科毕业设计作品
 
-| 方法   | 路径                  | 请求体               | 返回数据                                            |
-| ------ | --------------------- | -------------------- | --------------------------------------------------- |
-| `GET`  | `/reservoir/location` | 无                   | 全部水库的 `gdwId`、`resName`、`yearDam` 和 GeoJSON |
-| `GET`  | `/reservoir/{id}`     | 无                   | 指定 `gdw_id` 的水库详情及 GeoJSON                  |
-| `POST` | `/reservoir/position` | 纯文本水库名称       | 模糊匹配到的第一条记录                              |
-| `POST` | `/reservoir/filter`   | 纯文本 SQL 条件      | 满足条件的精简位置数据                              |
-| `POST` | `/reservoir/stats`    | `ReservoirForm` JSON | 筛选后的数量与分组统计                              |
-| `POST` | `/reservoir/sync`     | `ReservoirForm` JSON | 筛选后的地图位置数据                                |
-
-`/stats` 和 `/sync` 请求示例：
-
-```json
-{
-    "capMcm": { "eq": -1, "gt": -1, "ge": 10, "lt": -1, "le": 1000 },
-    "areaSkm": null,
-    "mainBasin": ["Yangtze"],
-    "mainUse": ["Irrigation"],
-    "quality": ["2: Good"],
-    "year": [1950, 2020],
-    "country": ["China"],
-    "depthM": null
-}
-```
-
-水库统计响应的 `data` 包含 `total`、`capMcm`、`areaSkm`、`mainUse`、`quality`、`yearDam` 和 `country`。每个统计项结构为 `{ "name": "分组", "value": 数量 }`。
-
-## 大坝接口
-
-基础路径：`/barrier`
-
-| 方法   | 路径                | 请求体             | 返回数据                                                       |
-| ------ | ------------------- | ------------------ | -------------------------------------------------------------- |
-| `GET`  | `/barrier/location` | 无                 | 全部大坝的 `gdwId`、`damName`、`damType`、`yearDam` 和 GeoJSON |
-| `GET`  | `/barrier/{id}`     | 无                 | 指定 `gdw_id` 的大坝详情                                       |
-| `POST` | `/barrier/position` | 纯文本大坝名称     | 模糊匹配到的第一条记录                                         |
-| `POST` | `/barrier/filter`   | 纯文本 SQL 条件    | 满足条件的精简位置数据                                         |
-| `POST` | `/barrier/stats`    | `BarrierForm` JSON | 筛选后的数量与分组统计                                         |
-| `POST` | `/barrier/sync`     | `BarrierForm` JSON | 筛选后的地图位置数据                                           |
-
-`/stats` 和 `/sync` 请求示例：
-
-```json
-{
-    "damType": ["Dam"],
-    "damLenM": null,
-    "mainBasin": ["Yangtze"],
-    "mainUse": ["Hydroelectricity"],
-    "quality": ["2: Good"],
-    "year": [1950, 2020],
-    "country": ["China"],
-    "damHgtM": { "eq": -1, "gt": 20, "ge": -1, "lt": -1, "le": -1 }
-}
-```
-
-大坝统计响应的 `data` 包含 `total`、`damType`、`powerMw`、`mainUse`、`quality`、`yearDam` 和 `country`。
-
-### 区间筛选规则
-
-`capMcm`、`areaSkm`、`depthM`、`damLenM` 和 `damHgtM` 使用相同的区间对象：
-
-| 字段 | 含义     |
-| ---- | -------- |
-| `eq` | 等于     |
-| `gt` | 大于     |
-| `ge` | 大于等于 |
-| `lt` | 小于     |
-| `le` | 小于等于 |
-
-值为 `-1` 表示不启用对应条件；整个对象为 `null` 表示不对该字段筛选。`year` 使用两个元素表示包含边界的起止年份。
-
-### 原始条件筛选的安全提示
-
-`/reservoir/filter` 和 `/barrier/filter` 会将请求体作为 SQL `WHERE` 条件直接拼接到查询中，例如 `country = 'China' AND year_dam >= 2000`。这两个接口存在 SQL 注入风险，只应向可信调用方开放。生产环境应增加鉴权、条件白名单，或改为结构化筛选参数。
-
-## LLM 代理接口
-
-基础路径：`/api/llm`
-
-| 方法   | 路径                                   | 说明                                   |
-| ------ | -------------------------------------- | -------------------------------------- |
-| `POST` | `/api/llm/{provider}/chat/completions` | 转发到 Provider 的 `/chat/completions` |
-| `POST` | `/api/llm/{provider}/embeddings`       | 转发到 Provider 的 `/embeddings`       |
-
-当前公共配置声明的 `provider` 值为 `cloud`、`local`、`chat` 和 `rag`。请求体会原样转发，代理自动添加以下请求头：
-
-```text
-Authorization: Bearer <provider-api-key>
-Content-Type: application/json
-```
-
-`base-url` 应包含服务的公共 API 前缀（通常为 `/v1`），但不要包含 `/chat/completions` 或 `/embeddings`。未知 Provider 会返回 HTTP 400。
-
-## 当前实现说明
-
-- `gdw_reservoir.wkb_geometry` 通过 `ST_AsGeoJSON` 转换为 GeoJSON 字符串；水库详情也包含空间数据。
-- `gdw_barrier.wkb_geometry` 在位置与筛选接口中转换为 GeoJSON；当前大坝详情查询不选择该字段。
-- 分类统计会过滤空字符串和数值 `-99`；区间统计也会忽略 `-99`。
-- 容量、面积和装机功率的统计区间为 `<1`、`1-10`、`10-100`、`100-1000`、`>1000`。
-- 年份统计区间为 `<1900`、`1900-1920`、`1920-1940`、`1940-1960`、`1960-1980`、`1980-2000`、`>2000`。
-- MyBatis SQL 日志当前输出到标准输出，生产环境建议调整日志级别或关闭 `StdOutImpl`。
-- 所有 Controller 当前通过 `@CrossOrigin(origins = "*")` 开放跨域，生产部署时应限制为实际前端域名。
-- 项目当前没有认证、授权和全局异常处理，请勿直接将管理能力暴露到公网。
-
-## 常用命令
-
-```bash
-# 编译并运行测试
-mvn test
-
-# 跳过测试打包
-mvn -DskipTests package
-
-# 查看依赖树
-mvn dependency:tree
-```
+</div>
