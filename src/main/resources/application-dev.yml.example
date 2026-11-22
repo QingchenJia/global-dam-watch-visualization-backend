@@ -1,0 +1,25 @@
+# 开发环境配置（对应 application.yml 中 spring.profiles.active: dev）
+# 请将以下占位符替换为实际配置信息
+
+postgresql:
+  url: jdbc:postgresql://<host>:<port>/<database>
+  username: <your-db-username>
+  password: <your-db-password>
+
+llm-config:
+  # 云端大模型配置
+  cloud:
+    base-url: <your-cloud-llm-base-url>
+    api-key: <your-cloud-llm-api-key>
+  # 本地大模型配置
+  local:
+    base-url: <your-local-llm-base-url>
+    api-key: <your-local-llm-api-key>
+  # 对话大模型配置
+  chat:
+    base-url: <your-chat-llm-base-url>
+    api-key: <your-chat-llm-api-key>
+  # RAG 大模型配置
+  rag:
+    base-url: <your-rag-llm-base-url>
+    api-key: <your-rag-llm-api-key>

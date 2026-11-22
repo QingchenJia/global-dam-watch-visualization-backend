@@ -127,7 +127,7 @@ psql -d gdw -f data/gdw_reservoir_99_indexes.sql
 ### 2. 配置数据库与大模型参数
 
 公共配置位于 `src/main/resources/application.yml`（默认启用 `dev` Profile）。  
-请在 `src/main/resources/application-dev.yml` 中填入实际的数据库与大模型参数（该文件已被 `.gitignore` 忽略，避免泄露真实密钥）：
+请将模板文件 `src/main/resources/application-dev.yml.example` 复制一份并重命名为 `application-dev.yml`，然后填入实际的数据库与大模型参数（`application-dev.yml` 已被 `.gitignore` 忽略，避免泄露真实密钥）：
 
 ```yaml
 postgresql:
@@ -305,7 +305,7 @@ global-dam-watch-visualization-backend/
 │  │  └─ util/                                    # 统计分组与区间查询工具类
 │  └─ resources/
 │     ├─ application.yml                          # 公共配置（默认启用 dev Profile）
-│     └─ application-dev.yml                      # 本地开发配置（含数据库与 LLM 占位符，已忽略）
+│     └─ application-dev.yml.example              # 开发环境配置模板（复制为 application-dev.yml 后填写真实配置）
 ├─ pom.xml                                        # Maven 项目配置
 └─ README.md
 ```
